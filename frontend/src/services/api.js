@@ -49,6 +49,7 @@ export const aiProBudgetAdvice = (data) => API.post("/ai/pro/budget-advice", dat
 
 // ── Subscriptions ──
 export const getPlans = () => API.get("/subscriptions/plans");
+export const activateViaPhone = (data) => API.post("/subscriptions/activate-phone", data);
 export const getSubStatus = () => API.get("/subscriptions/status");
 export const activatePro = (data) => API.post("/subscriptions/activate", data);
 export const verifyOTP = (data) => API.post("/subscriptions/verify-otp", data);
