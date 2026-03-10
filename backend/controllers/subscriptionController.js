@@ -188,7 +188,7 @@ const verifyOTPAndActivate = async (req, res) => {
       endDate,
       amount,
       currency: req.user.currency || "USD",
-      paymentMethod: "card",
+      paymentMethod: cardNumber ? "card" : "phone",
       transactionId: `TXN_${Date.now()}`,
     });
 
