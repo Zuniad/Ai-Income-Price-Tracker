@@ -132,6 +132,14 @@ const activatePro = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
+
 /**
  * @desc   Step 2: Verify OTP and activate Pro plan
  * @route  POST /api/subscriptions/verify-otp
@@ -352,12 +360,75 @@ const getPlans = async (_req, res) => {
   });
 };
 
+/**
+ * @desc   Phone Payment — enter phone, get OTP via response (toast)
+ * @route  POST /api/subscriptions/activate-phone
+ */
+const activateViaPhone = async (req, res) => {
+  try {
+    const { duration, phoneNumber } = req.body;
+
+    if (!duration || !["monthly", "yearly"].includes(duration)) {
+      return res.status(400).json({
+        success: false,
+        message: 'duration is required: "monthly" or "yearly"',
+      });
+    }
+
+    if (!phoneNumber || phoneNumber.replace(/[\s\-+]/g, "").length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid phone number is required (minimum 10 digits)",
+      });
+    }
+
+    const pricing = { monthly: 9.99, yearly: 99.99 };
+
+    await OTP.deleteMany({ userId: req.user._id, isVerified: false });
+
+    const otp = generateOTP();
+    const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
+
+    const user = await User.findById(req.user._id);
+
+    await OTP.create({
+      userId: req.user._id,
+      email: user.email,
+      otp,
+      purpose: "pro_activation",
+      paymentDetails: {
+        phoneNumber: phoneNumber.replace(/[\s\-]/g, ""),
+        duration,
+        amount: pricing[duration],
+      },
+      expiresAt,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `OTP sent to ${phoneNumber}`,
+      data: {
+        otp,
+        phoneNumber,
+        duration,
+        amount: pricing[duration],
+        otpExpiresIn: "2 minutes",
+        paymentMethod: "phone",
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getPlanStatus,
   activatePro,
+  activateViaPhone,
   verifyOTPAndActivate,
   resendOTP,
   cancelSubscription,
   getSubscriptionHistory,
   getPlans,
 };
+
