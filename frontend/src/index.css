@@ -1,0 +1,71 @@
+/* ── Global Styles ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a1a;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111127; }
+::-webkit-scrollbar-thumb { background: #333366; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00aaff; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+/* Neon glow effects */
+.glow-green { box-shadow: 0 0 20px rgba(0, 255, 136, 0.15), 0 0 60px rgba(0, 255, 136, 0.05); }
+.glow-red { box-shadow: 0 0 20px rgba(255, 68, 102, 0.15), 0 0 60px rgba(255, 68, 102, 0.05); }
+.glow-blue { box-shadow: 0 0 20px rgba(0, 170, 255, 0.15), 0 0 60px rgba(0, 170, 255, 0.05); }
+.glow-orange { box-shadow: 0 0 20px rgba(255, 136, 0, 0.15), 0 0 60px rgba(255, 136, 0, 0.05); }
+.glow-purple { box-shadow: 0 0 20px rgba(170, 85, 255, 0.15), 0 0 60px rgba(170, 85, 255, 0.05); }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #00ff88, #00aaff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-neon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse-neon { animation: pulse-neon 2s ease-in-out infinite; }
+
+input, select, textarea { outline: none; }
+input:focus, select:focus, textarea:focus {
+  border-color: #00aaff !important;
+  box-shadow: 0 0 0 2px rgba(0, 170, 255, 0.2);
+}
