@@ -56,27 +56,28 @@ export default function Subscription() {
       }));
     } else {
       // Phone payment — OTP returned in response, shown via toast
-      dispatch(activatePhone({
+            dispatch(activatePhone({
         duration: selectedPlan.interval,
         phoneNumber,
       })).then((res) => {
-        if (!res.error && res.payload?.data?.otp) {
+        const otpCode = res?.payload?.data?.otp || res?.payload?.otp;
+        if (!res.error && otpCode) {
           toast((t) => (
-            <div className="flex flex-col items-center gap-2">
-              <span className="font-bold text-lg">Your OTP</span>
-              <span className="text-3xl font-mono font-bold tracking-widest text-purple-600">
-                {res.payload.data.otp}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontWeight: "bold", fontSize: "18px", color: "#fff" }}>Your OTP</span>
+              <span style={{ fontSize: "32px", fontFamily: "monospace", fontWeight: "bold", letterSpacing: "8px", color: "#a855f7" }}>
+                {otpCode}
               </span>
-              <span className="text-xs text-gray-500">Expires in 2 minutes</span>
+              <span style={{ fontSize: "12px", color: "#9ca3af" }}>Expires in 2 minutes</span>
               <button
                 onClick={() => toast.dismiss(t.id)}
-                className="mt-1 text-xs text-gray-400 underline"
+                style={{ marginTop: "4px", fontSize: "12px", color: "#6b7280", textDecoration: "underline", background: "none", border: "none", cursor: "pointer" }}
               >
                 Dismiss
               </button>
             </div>
           ), {
-            duration: 120000, // 2 minutes
+            duration: 120000,
             style: {
               background: "#1a1a2e",
               color: "#fff",
