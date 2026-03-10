@@ -38,7 +38,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["card", "upi", "paypal", "bank_transfer", "other"],
+      enum: ["card", "upi", "paypal","phone", "bank_transfer", "other"],
       default: "card",
     },
     transactionId: {
