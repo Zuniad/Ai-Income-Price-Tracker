@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getPlans, getSubStatus, activatePro, verifyOTP, resendOTP, cancelSub, subHistory } from "../../services/api";
+import { getPlans, getSubStatus, activatePro, verifyOTP, resendOTP,activateViaPhone, cancelSub, subHistory } from "../../services/api";
 
 export const fetchPlans = createAsyncThunk("subscription/plans", async (_, { rejectWithValue }) => {
   try { const res = await getPlans(); return res.data; }
@@ -15,6 +15,12 @@ export const activate = createAsyncThunk("subscription/activate", async (data, {
   try { const res = await activatePro(data); return res.data; }
   catch (err) { return rejectWithValue(err.response?.data?.message || "Activation failed"); }
 });
+
+export const activatePhone = createAsyncThunk("subscription/activatePhone", async (data, { rejectWithValue }) => {
+  try { const res = await activateViaPhone(data); return res.data; }
+  catch (err) { return rejectWithValue(err.response?.data?.message || "Phone activation failed"); }
+});
+
 
 export const verify = createAsyncThunk("subscription/verify", async (data, { rejectWithValue }) => {
   try { const res = await verifyOTP(data); return res.data; }
@@ -74,6 +80,9 @@ const subscriptionSlice = createSlice({
       .addCase(activate.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(activate.fulfilled, (s, a) => { s.loading = false; s.otpSent = true; s.successMessage = a.payload.message || "OTP sent!"; })
       .addCase(activate.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
+      .addCase(activatePhone.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(activatePhone.fulfilled, (s, a) => { s.loading = false; s.otpSent = true; s.successMessage = a.payload.message || "OTP sent!"; })
+      .addCase(activatePhone.rejected, (s, a) => { s.loading = false; s.error = a.payload; })
       .addCase(verify.pending, (s) => { s.verifying = true; s.error = null; })
       .addCase(verify.fulfilled, (s, a) => { s.verifying = false; s.otpSent = false; s.status = a.payload.data || a.payload; s.successMessage = "Pro activated!"; })
       .addCase(verify.rejected, (s, a) => { s.verifying = false; s.error = a.payload; })
