@@ -215,7 +215,7 @@ const verifyOTPAndActivate = async (req, res) => {
       message: `🎉 Pro plan activated for ${duration} (${durationDays[duration]} days)!`,
       data: {
         subscription,
-        maskedCard: "**** **** **** " + cardNumber.slice(-4),
+        maskedCard: cardNumber ? "**** **** **** " + cardNumber.slice(-4) : "N/A (Phone Payment)",
         features: PLAN_LIMITS.pro,
       },
     });
