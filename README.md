@@ -21,6 +21,33 @@
   <a href="#-architecture">Architecture</a>
 </p>
 
+
+## ✨ Features
+- 📊 Loan Ledger (Bike, Home, etc.)
+- 💰 Savings Goals (monthly, tiered)
+- 🔐 Auth & Security Layer
+- 📈 Metrics Collector & Analytics
+- 🌐 System Design Simulations (API Gateway, CDN, Transcoding, etc.)
+
+---
+
+## 🎬 Live Preview
+<p align="center">
+  <a href="https://ai-income-price-tracker.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Preview-Click%20Here-brightgreen?style=for-the-badge&logo=github" />
+  </a>
+</p>
+
+---
+
+## 🌀 Animated Styling Example
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?size=22&duration=3000&color=00FF00&lines=Track+Income+Effortlessly;Manage+Loans+Smartly;Achieve+Savings+Goals" />
+</p>
+
+---
+
+
 ---
 
 ## 📋 Project Overview
