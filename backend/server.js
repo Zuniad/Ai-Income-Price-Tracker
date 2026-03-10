@@ -21,13 +21,21 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ── Global middleware ────────────────────────────────────────────────
-app.use(helmet());
+//app.use(helmet());
+// ── Global middleware ────────────────────────────────────────────────
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: false,
+  })
+);
 
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://ai-income-price-tracker.vercel.app/"],
+    origin: ["http://localhost:5173","https://ai-income-price-tracker.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: "*",
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
