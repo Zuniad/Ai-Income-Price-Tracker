@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPlans, fetchSubStatus, activate, verify, resend, cancel, fetchHistory, clearSubError, clearSubSuccess, resetOtpState } from "../features/subscription/subscriptionSlice";
+import { fetchPlans, fetchSubStatus, activate, activatePhone, verify, resend, cancel, fetchHistory, clearSubError, clearSubSuccess, resetOtpState } from "../features/subscription/subscriptionSlice";
 import { loadUser } from "../features/auth/authSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { Crown, Check, Zap, Shield, History } from "lucide-react";
+import { Crown, Check, Zap, Shield, History, CreditCard, Phone } from "lucide-react";
 import { PageHeader, GlassCard, Button, Modal, LoadingSpinner } from "../components/UI";
 import toast from "react-hot-toast";
 
@@ -15,6 +15,7 @@ export default function Subscription() {
   const [otp, setOtp] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card"); // "card" or "phone"
   const [cardNumber, setCardNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
@@ -45,12 +46,49 @@ export default function Subscription() {
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
     if (!selectedPlan) return;
-    dispatch(activate({
-      duration: selectedPlan.interval,
-      cardNumber: cardNumber.replace(/\s/g, ""),
-      phoneNumber,
-      email,
-    }));
+
+    if (paymentMethod === "card") {
+      dispatch(activate({
+        duration: selectedPlan.interval,
+        cardNumber: cardNumber.replace(/\s/g, ""),
+        phoneNumber,
+        email,
+      }));
+    } else {
+      // Phone payment — OTP returned in response, shown via toast
+      dispatch(activatePhone({
+        duration: selectedPlan.interval,
+        phoneNumber,
+      })).then((res) => {
+        if (!res.error && res.payload?.data?.otp) {
+          toast((t) => (
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-bold text-lg">Your OTP</span>
+              <span className="text-3xl font-mono font-bold tracking-widest text-purple-600">
+                {res.payload.data.otp}
+              </span>
+              <span className="text-xs text-gray-500">Expires in 2 minutes</span>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="mt-1 text-xs text-gray-400 underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          ), {
+            duration: 120000, // 2 minutes
+            style: {
+              background: "#1a1a2e",
+              color: "#fff",
+              border: "1px solid rgba(139, 92, 246, 0.3)",
+              borderRadius: "16px",
+              padding: "20px",
+            },
+            icon: "🔐",
+          });
+        }
+      });
+    }
     setShowPaymentForm(false);
   };
 
@@ -176,47 +214,95 @@ export default function Subscription() {
         <p className="text-gray-400 text-sm mb-4">
           Upgrading to <span className="text-white font-semibold">{selectedPlan?.name}</span> — ${selectedPlan?.price}/{selectedPlan?.interval === "yearly" ? "year" : "month"}
         </p>
+
+        {/* Payment Method Toggle */}
+        <div className="flex gap-2 mb-5">
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("card")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all ${
+              paymentMethod === "card"
+                ? "border-purple-500 bg-purple-500/10 text-purple-400"
+                : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
+            }`}
+          >
+            <CreditCard size={16} /> Credit Card
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("phone")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all ${
+              paymentMethod === "phone"
+                ? "border-purple-500 bg-purple-500/10 text-purple-400"
+                : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
+            }`}
+          >
+            <Phone size={16} /> Phone Payment
+          </button>
+        </div>
+
         <form onSubmit={handlePaymentSubmit} className="space-y-4">
-          <div>
-            <label className="text-gray-400 text-xs mb-1 block">Card Number</label>
-            <input
-              type="text"
-              required
-              minLength={13}
-              maxLength={19}
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value.replace(/[^\d\s]/g, ""))}
-              placeholder="1234 5678 9012 3456"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
-            />
-          </div>
-          <div>
-            <label className="text-gray-400 text-xs mb-1 block">Phone Number</label>
-            <input
-              type="tel"
-              required
-              minLength={10}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d+\-\s]/g, ""))}
-              placeholder="+1 234 567 8900"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
-            />
-          </div>
-          <div>
-            <label className="text-gray-400 text-xs mb-1 block">Email (for OTP verification)</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
-            />
-          </div>
+          {paymentMethod === "card" ? (
+            <>
+              <div>
+                <label className="text-gray-400 text-xs mb-1 block">Card Number</label>
+                <input
+                  type="text"
+                  required
+                  minLength={13}
+                  maxLength={19}
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value.replace(/[^\d\s]/g, ""))}
+                  placeholder="1234 5678 9012 3456"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-gray-400 text-xs mb-1 block">Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  minLength={10}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d+\-\s]/g, ""))}
+                  placeholder="+1 234 567 8900"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-gray-400 text-xs mb-1 block">Email (for OTP verification)</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
+                />
+              </div>
+            </>
+          ) : (
+            <div>
+              <label className="text-gray-400 text-xs mb-1 block">Phone Number</label>
+              <input
+                type="tel"
+                required
+                minLength={10}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d+\-\s]/g, ""))}
+                placeholder="+1 234 567 8900"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-neon-green/50 transition-all"
+              />
+              <p className="text-gray-500 text-xs mt-2">
+                OTP will be displayed on screen for 2 minutes
+              </p>
+            </div>
+          )}
+
           <div className="flex gap-3">
             <Button type="button" variant="secondary" onClick={() => { setShowPaymentForm(false); setSelectedPlan(null); }} className="flex-1 text-xs">Cancel</Button>
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? <div className="w-5 h-5 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" /> : "Proceed & Send OTP"}
+              {loading ? <div className="w-5 h-5 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" /> : paymentMethod === "card" ? "Proceed & Send OTP" : "Get OTP"}
             </Button>
           </div>
         </form>
@@ -224,7 +310,7 @@ export default function Subscription() {
 
       {/* OTP Modal */}
       <Modal open={otpSent} onClose={() => dispatch(resetOtpState())} title="Enter Verification OTP">
-        <p className="text-gray-400 text-sm mb-4">We sent a 6-digit OTP to your email. Enter it below to activate Pro.</p>
+        <p className="text-gray-400 text-sm mb-4">Enter the 6-digit OTP to activate Pro.</p>
         <form onSubmit={handleVerify} className="space-y-4">
           <input
             type="text"
