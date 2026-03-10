@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "http://localhost:3000/api" });
+const API = axios.create({ baseURL: "https://ai-income-price-tracker.onrender.com/api" });
 
 // Attach JWT token to every request
 API.interceptors.request.use((config) => {
