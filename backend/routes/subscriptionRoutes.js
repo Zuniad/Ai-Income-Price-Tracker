@@ -5,6 +5,7 @@ const {
   getPlanStatus,
   activatePro,
   verifyOTPAndActivate,
+  activateViaPhone,
   resendOTP,
   cancelSubscription,
   getSubscriptionHistory,
@@ -18,7 +19,8 @@ router.get("/plans", getPlans);
 router.use(protect);
 
 router.get("/status", getPlanStatus);
-router.post("/activate", activatePro);           // Step 1: enter card + send OTP
+router.post("/activate-phone",activateViaPhone);
+router.post("/activate", activatePro);   // Step 1: enter card + send OTP
 router.post("/verify-otp", verifyOTPAndActivate); // Step 2: verify OTP + activate
 router.post("/resend-otp", resendOTP);            // Resend OTP if expired
 router.post("/cancel", cancelSubscription);
